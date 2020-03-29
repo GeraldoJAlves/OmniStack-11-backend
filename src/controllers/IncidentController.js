@@ -2,9 +2,23 @@ const connection = require('../database/connection');
 
 module.exports = {
     async index(request, response) {
+        const { page = 1} = request.query;
 
-        const incidents = await connection('incidents').select('*');
+        const [count] =  await connection('incidents').count();
 
+        const incidents = await connection('incidents')
+            .join('ongs', 'ongs.id', '=', 'incidents.ong_id')
+            .limit(5)
+            .offset( (page -1) * 5 )
+            .select([
+                'incidents.*',
+                'ongs.name',
+                'ongs.whatsapp',
+                'ongs.name',
+                'ongs.city',
+                'ongs.uf'
+            ]);
+        response.header('X-total-Count', count['count(*)']);
         return response.json(incidents);
     },
     async create(request, response) {
@@ -31,7 +45,7 @@ module.exports = {
             .where('id', id)
             .select('ong_id')
             .first();
-            
+
         if (!incident){
             return response.status(404).send();
         }
