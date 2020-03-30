@@ -13,6 +13,7 @@ module.exports = {
             .select([
                 'incidents.*',
                 'ongs.name',
+                'ongs.email',
                 'ongs.whatsapp',
                 'ongs.name',
                 'ongs.city',
